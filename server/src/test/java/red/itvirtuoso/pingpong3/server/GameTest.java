@@ -25,11 +25,29 @@ public class GameTest {
         }
     }
     @Test
-    public void Gameインスタンスを作成する() throws Exception {
+    public void 一人目がGameインスタンスを作成する() throws Exception {
         TestClientProxy client1 = new TestClientProxy();
         Game game = new Game(client1);
+
         assertThat(client1.packets, is(contains(
                 new Packet(PacketType.ON_CONNECT_SUCCESS)
+        )));
+    }
+
+    @Test
+    public void 二人目がGameに参加する() throws Exception {
+        TestClientProxy client1 = new TestClientProxy();
+        Game game = new Game(client1);
+        TestClientProxy client2 = new TestClientProxy();
+        game.join(client2);
+
+        assertThat(client1.packets, is(contains(
+                new Packet(PacketType.ON_CONNECT_SUCCESS),
+                new Packet(PacketType.ON_READY)
+        )));
+        assertThat(client2.packets, is(contains(
+                new Packet(PacketType.ON_CONNECT_SUCCESS),
+                new Packet(PacketType.ON_READY)
         )));
     }
 }

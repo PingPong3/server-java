@@ -15,4 +15,8 @@ public class Game {
         Packet packet = new Packet(PacketType.ON_CONNECT_SUCCESS);
         this.client1.send(packet);
     }
+
+    public void join(ClientProxy client2) {
+
+    }
 }

@@ -30,7 +30,7 @@ public class GameTest {
         Game game = new Game(client1);
 
         assertThat(client1.packets, is(contains(
-                new Packet(PacketType.ON_CONNECT_SUCCESS)
+                new Packet(PacketType.CONNECT_SUCCESS)
         )));
     }
 
@@ -42,12 +42,12 @@ public class GameTest {
         game.join(client2);
 
         assertThat(client1.packets, is(contains(
-                new Packet(PacketType.ON_CONNECT_SUCCESS),
-                new Packet(PacketType.ON_READY)
+                new Packet(PacketType.CONNECT_SUCCESS),
+                new Packet(PacketType.ME_READY)
         )));
         assertThat(client2.packets, is(contains(
-                new Packet(PacketType.ON_CONNECT_SUCCESS),
-                new Packet(PacketType.ON_READY)
+                new Packet(PacketType.CONNECT_SUCCESS),
+                new Packet(PacketType.RIVAL_READY)
         )));
     }
 }

@@ -1,10 +1,12 @@
 package red.itvirtuoso.pingpong3.server;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import red.itvirtuoso.pingpong3.server.client.local.WallClientProxy;
+import red.itvirtuoso.pingpong3.server.client.remote.SocketClientProxy;
 
 public class Main {
     public static void main(String[] args) {
@@ -13,16 +15,9 @@ public class Main {
             listener.bind(new InetSocketAddress(5000));
             System.out.println("Server listening port 5000...");
             while (true) {
-                try (Socket socket = listener.accept()) {
-                    InputStream stream = socket.getInputStream();
-                    while (true) {
-                        int data = stream.read();
-                        if (data < 0) {
-                            break;
-                        }
-                        System.out.println(data);
-                    }
-                }
+                Socket socket1 = listener.accept();
+                GameServer gameServer = new GameServer(new SocketClientProxy(socket1));
+                gameServer.challenge(new WallClientProxy());
             }
         } catch (IOException e) {
             e.printStackTrace();

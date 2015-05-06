@@ -15,9 +15,14 @@ import static org.hamcrest.Matchers.is;
 /**
  * Created by kenji on 15/05/04.
  */
-public class GameTest {
-    private class TestClientProxy implements ClientProxy {
+public class GameServerTest {
+    private class TestClientProxy extends ClientProxy {
         private ArrayList<Packet> packets = new ArrayList<>();
+
+        @Override
+        public boolean isClosed() {
+            return true;
+        }
 
         @Override
         public void send(Packet packet) {
@@ -27,7 +32,7 @@ public class GameTest {
     @Test
     public void 一人目がGameインスタンスを作成する() throws Exception {
         TestClientProxy client1 = new TestClientProxy();
-        Game game = new Game(client1);
+        GameServer gameServer = new GameServer(client1);
 
         assertThat(client1.packets, is(contains(
                 new Packet(PacketType.CONNECT_SUCCESS)
@@ -37,9 +42,9 @@ public class GameTest {
     @Test
     public void 二人目がGameに参加する() throws Exception {
         TestClientProxy client1 = new TestClientProxy();
-        Game game = new Game(client1);
+        GameServer gameServer = new GameServer(client1);
         TestClientProxy client2 = new TestClientProxy();
-        game.join(client2);
+        gameServer.challenge(client2);
 
         assertThat(client1.packets, is(contains(
                 new Packet(PacketType.CONNECT_SUCCESS),

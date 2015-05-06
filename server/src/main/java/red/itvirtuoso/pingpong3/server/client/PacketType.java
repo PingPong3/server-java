@@ -29,4 +29,13 @@ public enum PacketType {
     public int getId() {
         return id;
     }
+
+    public static PacketType valueOf(int id) {
+        for (PacketType type : values()) {
+            if (type.getId() == id) {
+                return type;
+            }
+        }
+        return null;
+    }
 }

@@ -1,10 +1,15 @@
 package red.itvirtuoso.pingpong3.server.client;
 
+import java.util.ArrayList;
+
 /**
  * Created by kenji on 15/05/04.
  */
 public abstract class ClientProxy {
+    private ArrayList<Packet> packets;
+
     public ClientProxy() {
+        packets = new ArrayList<>();
         System.out.println(getClass().getSimpleName() + " is connected");
     }
 
@@ -18,10 +23,14 @@ public abstract class ClientProxy {
     }
 
     protected void addPacket(Packet packet) {
-        /* nop */
+        synchronized (packets) {
+            packets.add(packet);
+        }
     }
 
     public final Packet receive() {
-        return null;
+        synchronized (packets) {
+            return packets.size() == 0 ? null : packets.remove(0);
+        }
     }
 }

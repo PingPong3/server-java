@@ -1,4 +1,4 @@
-package red.itvirtuoso.pingpong3.server.client.remote;
+package red.itvirtuoso.pingpong3.server.client.socket;
 
 import java.io.IOException;
 import java.io.InputStream;

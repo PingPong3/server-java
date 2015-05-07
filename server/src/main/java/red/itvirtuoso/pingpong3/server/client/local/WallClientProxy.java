@@ -24,4 +24,9 @@ public class WallClientProxy extends ClientProxy {
     public void send(Packet packet) throws ClientException {
         /* TODO */
     }
+
+    @Override
+    public void close() {
+        isClosed = true;
+    }
 }

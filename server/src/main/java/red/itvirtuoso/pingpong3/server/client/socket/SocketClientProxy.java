@@ -27,7 +27,7 @@ public class SocketClientProxy extends ClientProxy implements Runnable {
 
     @Override
     public boolean isClosed() {
-        return socket.isClosed();
+        return socket != null ? socket.isClosed() : false;
     }
 
     @Override
@@ -38,14 +38,16 @@ public class SocketClientProxy extends ClientProxy implements Runnable {
                 if (data < 0) {
                     onClose();
                     socket.close();
-                    System.out.println("socket.isClosed is " + socket.isClosed());
                     break;
                 }
                 Packet packet = new Packet(PacketType.valueOf(data));
-                receive(packet);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            try {
+                socket.close();
+            } catch (IOException e1) {
+                /* nop */
+            }
         }
     }
 
@@ -55,6 +57,19 @@ public class SocketClientProxy extends ClientProxy implements Runnable {
             socket.getOutputStream().write(packet.getType().getId());
         } catch (IOException e) {
             throw new ClientException(e);
+        }
+    }
+
+    @Override
+    public void close() {
+        try {
+            if (socket != null) {
+                socket.close();
+                socket = null;
+            }
+        } catch (IOException e) {
+            System.out.println("socketをクローズできませんでした");
+            socket = null;
         }
     }
 }

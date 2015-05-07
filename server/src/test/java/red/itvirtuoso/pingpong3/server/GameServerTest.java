@@ -28,7 +28,13 @@ public class GameServerTest {
         public void send(Packet packet) {
             packets.add(packet);
         }
+
+        @Override
+        public void close() {
+
+        }
     }
+
     @Test
     public void 一人目がGameインスタンスを作成する() throws Exception {
         TestClientProxy client1 = new TestClientProxy();

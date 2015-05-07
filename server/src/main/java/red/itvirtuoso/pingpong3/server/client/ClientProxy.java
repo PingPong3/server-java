@@ -10,10 +10,18 @@ public abstract class ClientProxy {
 
     public abstract boolean isClosed();
     public abstract void send(Packet packet) throws ClientException;
-    public final void onClose() {
-        System.out.println("ClientProxy is closed");
+
+    public abstract void close();
+
+    protected final void onClose() {
+        System.out.println(getClass().getSimpleName() + " is closed");
     }
-    public final void receive(Packet packet) {
-        /* TODO */
+
+    protected void addPacket(Packet packet) {
+        /* nop */
+    }
+
+    public final Packet receive() {
+        return null;
     }
 }

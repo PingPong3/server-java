@@ -1,21 +1,21 @@
 package red.itvirtuoso.pingpong3.server.server;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import red.itvirtuoso.pingpong3.server.client.ClientProxy;
 import red.itvirtuoso.pingpong3.server.Packet;
 import red.itvirtuoso.pingpong3.server.PacketType;
+import red.itvirtuoso.pingpong3.server.client.ClientProxy;
 import red.itvirtuoso.pingpong3.server.server.action.Action;
+import red.itvirtuoso.pingpong3.server.server.action.ModeAction;
 import red.itvirtuoso.pingpong3.server.server.action.PacketAction;
 
 /**
  * Created by kenji on 15/05/04.
  */
 public class GameServer implements Runnable {
-    private static final long STEP_TIME = 750;
+    private static final long STEP_TIME = 350;
 
     private long stepTime;
     private ClientProxy client1;
@@ -50,7 +50,7 @@ public class GameServer implements Runnable {
         while (!client1.isClosed() && !client2.isClosed()) {
             Thread.yield();
             doClient1Action(client1.receive());
-//            doClient2Action(client2.receive());
+            doClient2Action(client2.receive());
             doReservedActions();
         }
         System.out.println("End game");
@@ -68,20 +68,45 @@ public class GameServer implements Runnable {
         }
     }
 
+    private void doClient2Action(Packet packet) {
+        if (packet == null) {
+            return;
+        }
+
+        if (packet.getType() == PacketType.SWING) {
+            if (mode == Mode.CLIENT2_RETURN) {
+                client2Return();
+            }
+        }
+    }
+
     private void client1Serve() {
         long currentTime = System.currentTimeMillis();
         synchronized (actions) {
+            actions.clear();
             addPacketAction(currentTime, Target.CLIENT1, 0, PacketType.ME_SERVE);
-            addPacketAction(currentTime, Target.CLIENT1, 1, PacketType.RIVAL_BOUND_MY_AREA);
-            addPacketAction(currentTime, Target.CLIENT1, 2, PacketType.RIVAL_BOUND_RIVAL_AREA);
-            addPacketAction(currentTime, Target.CLIENT1, 4, PacketType.ME_POINT);
-
             addPacketAction(currentTime, Target.CLIENT2, 0, PacketType.RIVAL_SERVE);
-            addPacketAction(currentTime, Target.CLIENT2, 1, PacketType.ME_BOUND_RIVAL_AREA);
-            addPacketAction(currentTime, Target.CLIENT2, 2, PacketType.ME_BOUND_MY_AREA);
-            addPacketAction(currentTime, Target.CLIENT2, 4, PacketType.RIVAL_POINT);
+            addPacketAction(currentTime, Target.CLIENT1, 2, PacketType.RIVAL_BOUND_MY_AREA);
+            addPacketAction(currentTime, Target.CLIENT2, 2, PacketType.ME_BOUND_RIVAL_AREA);
+            addPacketAction(currentTime, Target.CLIENT1, 4, PacketType.RIVAL_BOUND_RIVAL_AREA);
+            addPacketAction(currentTime, Target.CLIENT2, 4, PacketType.ME_BOUND_MY_AREA);
+            addModeAction(currentTime, 5, Mode.CLIENT2_RETURN);
+            addModeAction(currentTime, 7, Mode.BUSY);
+            addPacketAction(currentTime, Target.CLIENT1, 8, PacketType.ME_POINT);
+            addPacketAction(currentTime, Target.CLIENT2, 8, PacketType.RIVAL_POINT);
+        }
+    }
 
-            Collections.sort(actions);
+    private void client2Return() {
+        long currentTime = System.currentTimeMillis();
+        synchronized (actions) {
+            actions.clear();
+            addPacketAction(currentTime, Target.CLIENT2, 0, PacketType.ME_RETURN);
+            addPacketAction(currentTime, Target.CLIENT1, 0, PacketType.RIVAL_RETURN);
+            addPacketAction(currentTime, Target.CLIENT2, 4, PacketType.RIVAL_BOUND_RIVAL_AREA);
+            addPacketAction(currentTime, Target.CLIENT1, 4, PacketType.ME_BOUND_MY_AREA);
+            addPacketAction(currentTime, Target.CLIENT2, 8, PacketType.ME_POINT);
+            addPacketAction(currentTime, Target.CLIENT1, 8, PacketType.RIVAL_POINT);
         }
     }
 
@@ -100,6 +125,16 @@ public class GameServer implements Runnable {
                         break;
                     default: /* nop */
                 }
+            }
+        });
+    }
+
+    private void addModeAction(long currentTime, int step, Mode mode) {
+        long time = currentTime + step * stepTime;
+        actions.add(new ModeAction(time, mode) {
+            @Override
+            public void execute() {
+                GameServer.this.mode = getMode();
             }
         });
     }

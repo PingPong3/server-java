@@ -178,4 +178,59 @@ public class GameServerTest {
                 builder.create(4, PacketType.RIVAL_POINT)
         )));
     }
+
+    @Test
+    public void 一人目がサーブして二人目がリターンする() throws Exception {
+        /*
+         * 次のパケットが順に送信される
+         * <p>client1</p>
+         * <ul>
+         *     <li>0, ME_SERVE</li>
+         *     <li>1, RIVAL_BOUND_MY_AREA</li>
+         *     <li>2, RIVAL_BOUND_RIVAL_AREA</li>
+         *     <li>3, RIVAL_RETURN</li>
+         *     <li>5, ME_BOUND_MY_AREA</li>
+         *     <li>7, RIVAL_POINT</li>
+         * </ul>
+         * <p>client2</p>
+         * <ul>
+         *     <li>0, RIVAL_SERVE</li>
+         *     <li>1, ME_BOUND_RIVAL_AREA</li>
+         *     <li>2, ME_BOUND_ME_AREA</li>
+         *     <li>3, ME_RETURN</li>
+         *     <li>5, RIVAL_BOUND_RIVAL_AREA</li>
+         *     <li>7, ME_POINT</li>
+         * </ul>
+         */
+
+        TestClientProxy client1 = new TestClientProxy();
+        GameServer gameServer = new GameServer(client1, STEP_TIME);
+        TestClientProxy client2 = new TestClientProxy();
+        gameServer.challenge(client2);
+        client1.clearPackets();
+        client2.clearPackets();
+
+        client1.addPacket(new Packet(PacketType.SWING));
+        Thread.sleep(STEP_TIME * 3);
+        client2.addPacket(new Packet(PacketType.SWING));
+        Thread.sleep(STEP_TIME * (4 + 1));
+
+        _LogBuilder builder = new _LogBuilder(STEP_TIME);
+        assertThat(client1.sendLogs, is(contains(
+                builder.create(0, PacketType.ME_SERVE),
+                builder.create(1, PacketType.RIVAL_BOUND_MY_AREA),
+                builder.create(2, PacketType.RIVAL_BOUND_RIVAL_AREA),
+                builder.create(3, PacketType.RIVAL_RETURN),
+                builder.create(5, PacketType.ME_BOUND_MY_AREA),
+                builder.create(7, PacketType.RIVAL_POINT)
+        )));
+        assertThat(client2.sendLogs, is(contains(
+                builder.create(0, PacketType.RIVAL_SERVE),
+                builder.create(1, PacketType.ME_BOUND_RIVAL_AREA),
+                builder.create(2, PacketType.ME_BOUND_MY_AREA),
+                builder.create(3, PacketType.ME_RETURN),
+                builder.create(5, PacketType.RIVAL_BOUND_RIVAL_AREA),
+                builder.create(7, PacketType.ME_POINT)
+        )));
+    }
 }

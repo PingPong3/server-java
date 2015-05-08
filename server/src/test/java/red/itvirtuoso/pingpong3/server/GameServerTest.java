@@ -77,22 +77,23 @@ public class GameServerTest {
     }
 
     private class TestClientProxy extends ClientProxy {
+        private boolean isClosed = false;
         private _LogBuilder builder = new _LogBuilder(STEP_TIME);
         private ArrayList<_Log> sendLogs = new ArrayList<>();
 
         @Override
         public boolean isClosed() {
-            return true;
+            return isClosed;
         }
 
         @Override
         public void send(Packet packet) {
-            sendLogs.add(builder.create(0, packet.getType()));
+            sendLogs.add(builder.create(packet.getType()));
         }
 
         @Override
         public void close() {
-            /* nop */
+            isClosed = true;
         }
 
         @Override
@@ -121,7 +122,7 @@ public class GameServerTest {
 
         TestClientProxy client1 = new TestClientProxy();
         _LogBuilder builder = new _LogBuilder(STEP_TIME);
-        GameServer gameServer = new GameServer(client1);
+        GameServer gameServer = new GameServer(client1, STEP_TIME);
         TestClientProxy client2 = new TestClientProxy();
         gameServer.challenge(client2);
 
@@ -154,7 +155,7 @@ public class GameServerTest {
          */
 
         TestClientProxy client1 = new TestClientProxy();
-        GameServer gameServer = new GameServer(client1);
+        GameServer gameServer = new GameServer(client1, STEP_TIME);
         TestClientProxy client2 = new TestClientProxy();
         gameServer.challenge(client2);
         client1.clearPackets();

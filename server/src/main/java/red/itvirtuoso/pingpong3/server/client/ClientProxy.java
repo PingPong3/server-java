@@ -6,10 +6,9 @@ import java.util.ArrayList;
  * Created by kenji on 15/05/04.
  */
 public abstract class ClientProxy {
-    private ArrayList<Packet> packets;
+    private ArrayList<Packet> packets = new ArrayList<>();
 
     public ClientProxy() {
-        packets = new ArrayList<>();
         System.out.println(getClass().getSimpleName() + " is connected");
     }
 

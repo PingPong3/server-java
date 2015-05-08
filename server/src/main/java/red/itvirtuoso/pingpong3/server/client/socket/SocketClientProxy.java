@@ -34,6 +34,7 @@ public class SocketClientProxy extends ClientProxy implements Runnable {
     public void run() {
         try (InputStream stream = socket.getInputStream()) {
             while (true) {
+                Thread.yield();
                 int data = stream.read();
                 if (data < 0) {
                     onClose();

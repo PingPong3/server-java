@@ -4,7 +4,6 @@ package red.itvirtuoso.pingpong3.server.client;
  * Created by kenji on 15/05/04.
  */
 public enum PacketType {
-    CONNECT_SUCCESS(0),
     SWING(1),
     ME_READY(2),
     ME_SERVE(3),

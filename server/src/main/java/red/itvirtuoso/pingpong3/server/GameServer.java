@@ -16,12 +16,10 @@ public class GameServer implements Runnable {
 
     public GameServer(ClientProxy client1) {
         this.client1 = client1;
-        this.client1.send(new Packet(PacketType.CONNECT_SUCCESS));
     }
 
     public void challenge(ClientProxy client2) {
         this.client2 = client2;
-        this.client2.send(new Packet(PacketType.CONNECT_SUCCESS));
         this.client1.send(new Packet(PacketType.ME_READY));
         this.client2.send(new Packet(PacketType.RIVAL_READY));
 

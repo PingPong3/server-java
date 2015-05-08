@@ -7,6 +7,7 @@ import java.net.Socket;
 
 import red.itvirtuoso.pingpong3.server.client.local.WallClientProxy;
 import red.itvirtuoso.pingpong3.server.client.socket.SocketClientProxy;
+import red.itvirtuoso.pingpong3.server.server.GameServer;
 
 public class Main {
     public static void main(String[] args) {

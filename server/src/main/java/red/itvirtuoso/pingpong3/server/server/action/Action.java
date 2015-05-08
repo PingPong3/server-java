@@ -1,9 +1,9 @@
-package red.itvirtuoso.pingpong3.server;
+package red.itvirtuoso.pingpong3.server.server.action;
 
 /**
  * Created by kenji on 15/05/03.
  */
-abstract class Action implements Comparable<Action> {
+public abstract class Action implements Comparable<Action> {
     private long time;
 
     public Action(long time) {

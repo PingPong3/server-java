@@ -2,6 +2,9 @@ package red.itvirtuoso.pingpong3.server.client;
 
 import org.junit.Test;
 
+import red.itvirtuoso.pingpong3.server.Packet;
+import red.itvirtuoso.pingpong3.server.PacketType;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
@@ -11,9 +14,10 @@ import static org.hamcrest.Matchers.nullValue;
  */
 public class ClientProxyTest {
     private class TestClientProxy extends ClientProxy {
+        private boolean isClosed = false;
         @Override
         public boolean isClosed() {
-            return false;
+            return isClosed();
         }
 
         @Override
@@ -23,7 +27,7 @@ public class ClientProxyTest {
 
         @Override
         public void close() {
-            onClose();
+            isClosed = true;
         }
     }
 

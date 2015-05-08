@@ -1,11 +1,12 @@
-package red.itvirtuoso.pingpong3.server;
+package red.itvirtuoso.pingpong3.server.server.action;
 
-import red.itvirtuoso.pingpong3.server.client.PacketType;
+import red.itvirtuoso.pingpong3.server.PacketType;
+import red.itvirtuoso.pingpong3.server.server.Target;
 
 /**
  * Created by kenji on 15/05/03.
  */
-abstract class PacketAction extends Action {
+public abstract class PacketAction extends Action {
     private Target target;
     private PacketType type;
 

@@ -2,7 +2,7 @@ package red.itvirtuoso.pingpong3.server.client.local;
 
 import red.itvirtuoso.pingpong3.server.client.ClientException;
 import red.itvirtuoso.pingpong3.server.client.ClientProxy;
-import red.itvirtuoso.pingpong3.server.client.Packet;
+import red.itvirtuoso.pingpong3.server.Packet;
 
 /**
  * Created by kenji on 15/05/06.

@@ -1,4 +1,4 @@
-package red.itvirtuoso.pingpong3.server;
+package red.itvirtuoso.pingpong3.server.server;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -6,8 +6,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import red.itvirtuoso.pingpong3.server.client.ClientProxy;
-import red.itvirtuoso.pingpong3.server.client.Packet;
-import red.itvirtuoso.pingpong3.server.client.PacketType;
+import red.itvirtuoso.pingpong3.server.Packet;
+import red.itvirtuoso.pingpong3.server.PacketType;
+import red.itvirtuoso.pingpong3.server.server.action.Action;
+import red.itvirtuoso.pingpong3.server.server.action.PacketAction;
 
 /**
  * Created by kenji on 15/05/04.
@@ -59,7 +61,6 @@ public class GameServer implements Runnable {
             return;
         }
 
-        System.out.println("doClient1Action packet = " + packet + ", mode = " + mode);
         if (packet.getType() == PacketType.SWING) {
             if (mode == Mode.CLIENT1_READY) {
                 client1Serve();

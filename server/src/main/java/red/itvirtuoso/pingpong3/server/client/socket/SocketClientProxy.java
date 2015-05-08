@@ -8,8 +8,8 @@ import java.util.concurrent.Executors;
 
 import red.itvirtuoso.pingpong3.server.client.ClientException;
 import red.itvirtuoso.pingpong3.server.client.ClientProxy;
-import red.itvirtuoso.pingpong3.server.client.Packet;
-import red.itvirtuoso.pingpong3.server.client.PacketType;
+import red.itvirtuoso.pingpong3.server.Packet;
+import red.itvirtuoso.pingpong3.server.PacketType;
 
 /**
  * Created by kenji on 15/05/06.
@@ -37,11 +37,11 @@ public class SocketClientProxy extends ClientProxy implements Runnable {
                 Thread.yield();
                 int data = stream.read();
                 if (data < 0) {
-                    onClose();
                     socket.close();
                     break;
                 }
                 Packet packet = new Packet(PacketType.valueOf(data));
+                addPacket(packet);
             }
         } catch (IOException e) {
             try {

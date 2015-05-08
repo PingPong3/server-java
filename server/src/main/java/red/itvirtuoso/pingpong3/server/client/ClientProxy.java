@@ -2,24 +2,18 @@ package red.itvirtuoso.pingpong3.server.client;
 
 import java.util.ArrayList;
 
+import red.itvirtuoso.pingpong3.server.Packet;
+
 /**
  * Created by kenji on 15/05/04.
  */
 public abstract class ClientProxy {
     private ArrayList<Packet> packets = new ArrayList<>();
 
-    public ClientProxy() {
-        System.out.println(getClass().getSimpleName() + " is connected");
-    }
-
     public abstract boolean isClosed();
     public abstract void send(Packet packet) throws ClientException;
 
     public abstract void close();
-
-    protected final void onClose() {
-        System.out.println(getClass().getSimpleName() + " is closed");
-    }
 
     protected void addPacket(Packet packet) {
         synchronized (packets) {

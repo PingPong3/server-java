@@ -1,12 +1,12 @@
-package red.itvirtuoso.pingpong3.server;
+package red.itvirtuoso.pingpong3.server.server;
 
 import org.junit.Test;
 
 import java.util.ArrayList;
 
 import red.itvirtuoso.pingpong3.server.client.ClientProxy;
-import red.itvirtuoso.pingpong3.server.client.Packet;
-import red.itvirtuoso.pingpong3.server.client.PacketType;
+import red.itvirtuoso.pingpong3.server.Packet;
+import red.itvirtuoso.pingpong3.server.PacketType;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;

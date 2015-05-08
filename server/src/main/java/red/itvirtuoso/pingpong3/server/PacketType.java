@@ -1,4 +1,4 @@
-package red.itvirtuoso.pingpong3.server.client;
+package red.itvirtuoso.pingpong3.server;
 
 /**
  * Created by kenji on 15/05/04.

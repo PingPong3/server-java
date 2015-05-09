@@ -124,13 +124,41 @@ public class GameServerTest {
         _LogBuilder builder = new _LogBuilder(STEP_TIME);
         GameServer gameServer = new GameServer(client1, STEP_TIME);
         TestClientProxy client2 = new TestClientProxy();
-        gameServer.challenge(client2);
+        gameServer.challenge(client2, false);
 
         assertThat(client1.sendLogs, is(contains(
                 builder.create(0, PacketType.ME_READY)
         )));
         assertThat(client2.sendLogs, is(contains(
                 builder.create(0, PacketType.RIVAL_READY)
+        )));
+    }
+
+    @Test
+    public void 後から参加したクライアントにサーブ権がある状態でゲームを開始する() throws Exception {
+        /*
+         * 次のパケットが順に送信される
+         * <p>client1</p>
+         * <ul>
+         *     <li>0, RIVAL_READY</li>
+         * </ul>
+         * <p>client2</p>
+         * <ul>
+         *     <li>0, ME_READY</li>
+         * </ul>
+         */
+
+        TestClientProxy client1 = new TestClientProxy();
+        _LogBuilder builder = new _LogBuilder(STEP_TIME);
+        GameServer gameServer = new GameServer(client1, STEP_TIME);
+        TestClientProxy client2 = new TestClientProxy();
+        gameServer.challenge(client2, true);
+
+        assertThat(client1.sendLogs, is(contains(
+                builder.create(0, PacketType.RIVAL_READY)
+        )));
+        assertThat(client2.sendLogs, is(contains(
+                builder.create(0, PacketType.ME_READY)
         )));
     }
 
@@ -157,7 +185,7 @@ public class GameServerTest {
         TestClientProxy client1 = new TestClientProxy();
         GameServer gameServer = new GameServer(client1, STEP_TIME);
         TestClientProxy client2 = new TestClientProxy();
-        gameServer.challenge(client2);
+        gameServer.challenge(client2, false);
         client1.clearPackets();
         client2.clearPackets();
 
@@ -209,7 +237,7 @@ public class GameServerTest {
         TestClientProxy client1 = new TestClientProxy();
         GameServer gameServer = new GameServer(client1, STEP_TIME);
         TestClientProxy client2 = new TestClientProxy();
-        gameServer.challenge(client2);
+        gameServer.challenge(client2, false);
         client1.clearPackets();
         client2.clearPackets();
 

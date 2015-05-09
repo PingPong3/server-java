@@ -18,7 +18,7 @@ public class Main {
             while (true) {
                 Socket socket1 = listener.accept();
                 GameServer gameServer = new GameServer(new SocketClientProxy(socket1));
-                gameServer.challenge(new WallClientProxy());
+                gameServer.challenge(new WallClientProxy(), false);
             }
         } catch (IOException e) {
             e.printStackTrace();

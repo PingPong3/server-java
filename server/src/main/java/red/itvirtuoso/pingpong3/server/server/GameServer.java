@@ -33,7 +33,17 @@ public class GameServer implements Runnable {
         this(client1, STEP_TIME);
     }
 
-    public void challenge(ClientProxy client2) {
+    public void challenge(ClientProxy client2, boolean hasServe) {
+        if (hasServe) {
+            ClientProxy client1 = this.client1;
+            this.client1 = client2;
+            challenge(client1);
+        } else {
+            challenge(client2);
+        }
+    }
+
+    private void challenge(ClientProxy client2) {
         this.client2 = client2;
         this.client1.send(new Packet(PacketType.ME_READY));
         this.client2.send(new Packet(PacketType.RIVAL_READY));

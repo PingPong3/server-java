@@ -84,6 +84,7 @@ public class GameServer implements Runnable {
         long currentTime = System.currentTimeMillis();
         synchronized (actions) {
             actions.clear();
+            addModeAction(currentTime, 0, Mode.BUSY);
             addPacketAction(currentTime, Target.CLIENT1, 0, PacketType.ME_SERVE);
             addPacketAction(currentTime, Target.CLIENT2, 0, PacketType.RIVAL_SERVE);
             addPacketAction(currentTime, Target.CLIENT1, 2, PacketType.RIVAL_BOUND_MY_AREA);
@@ -94,6 +95,9 @@ public class GameServer implements Runnable {
             addModeAction(currentTime, 7, Mode.BUSY);
             addPacketAction(currentTime, Target.CLIENT1, 8, PacketType.ME_POINT);
             addPacketAction(currentTime, Target.CLIENT2, 8, PacketType.RIVAL_POINT);
+            addModeAction(currentTime, 12, Mode.CLIENT1_READY);
+            addPacketAction(currentTime, Target.CLIENT1, 12, PacketType.ME_READY);
+            addPacketAction(currentTime, Target.CLIENT2, 12, PacketType.RIVAL_READY);
         }
     }
 
@@ -101,12 +105,18 @@ public class GameServer implements Runnable {
         long currentTime = System.currentTimeMillis();
         synchronized (actions) {
             actions.clear();
+            addModeAction(currentTime, 0, Mode.BUSY);
             addPacketAction(currentTime, Target.CLIENT2, 0, PacketType.ME_RETURN);
             addPacketAction(currentTime, Target.CLIENT1, 0, PacketType.RIVAL_RETURN);
             addPacketAction(currentTime, Target.CLIENT2, 4, PacketType.RIVAL_BOUND_RIVAL_AREA);
             addPacketAction(currentTime, Target.CLIENT1, 4, PacketType.ME_BOUND_MY_AREA);
+            addModeAction(currentTime, 5, Mode.CLIENT1_RETURN);
+            addModeAction(currentTime, 7, Mode.BUSY);
             addPacketAction(currentTime, Target.CLIENT2, 8, PacketType.ME_POINT);
             addPacketAction(currentTime, Target.CLIENT1, 8, PacketType.RIVAL_POINT);
+            addModeAction(currentTime, 12, Mode.CLIENT2_READY);
+            addPacketAction(currentTime, Target.CLIENT2, 12, PacketType.ME_READY);
+            addPacketAction(currentTime, Target.CLIENT1, 12, PacketType.RIVAL_READY);
         }
     }
 

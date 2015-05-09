@@ -162,7 +162,7 @@ public class GameServerTest {
         client2.clearPackets();
 
         client1.addPacket(new Packet(PacketType.SWING));
-        Thread.sleep(STEP_TIME * 8);
+        Thread.sleep(STEP_TIME * 12);
         Thread.sleep(STEP_TIME);
 
         _LogBuilder builder = new _LogBuilder(STEP_TIME);
@@ -170,13 +170,15 @@ public class GameServerTest {
                 builder.create(0, PacketType.ME_SERVE),
                 builder.create(2, PacketType.RIVAL_BOUND_MY_AREA),
                 builder.create(4, PacketType.RIVAL_BOUND_RIVAL_AREA),
-                builder.create(8, PacketType.ME_POINT)
+                builder.create(8, PacketType.ME_POINT),
+                builder.create(12, PacketType.ME_READY)
         )));
         assertThat(client2.sendLogs, is(contains(
                 builder.create(0, PacketType.RIVAL_SERVE),
                 builder.create(2, PacketType.ME_BOUND_RIVAL_AREA),
                 builder.create(4, PacketType.ME_BOUND_MY_AREA),
-                builder.create(8, PacketType.RIVAL_POINT)
+                builder.create(8, PacketType.RIVAL_POINT),
+                builder.create(12, PacketType.RIVAL_READY)
         )));
     }
 
@@ -214,7 +216,7 @@ public class GameServerTest {
         client1.addPacket(new Packet(PacketType.SWING));
         Thread.sleep(STEP_TIME * 6);
         client2.addPacket(new Packet(PacketType.SWING));
-        Thread.sleep(STEP_TIME * 8);
+        Thread.sleep(STEP_TIME * 12);
         Thread.sleep(STEP_TIME);
 
         _LogBuilder builder = new _LogBuilder(STEP_TIME);
@@ -224,7 +226,8 @@ public class GameServerTest {
                 builder.create(4, PacketType.RIVAL_BOUND_RIVAL_AREA),
                 builder.create(6, PacketType.RIVAL_RETURN),
                 builder.create(10, PacketType.ME_BOUND_MY_AREA),
-                builder.create(14, PacketType.RIVAL_POINT)
+                builder.create(14, PacketType.RIVAL_POINT),
+                builder.create(18, PacketType.RIVAL_READY)
         )));
         assertThat(client2.sendLogs, is(contains(
                 builder.create(0, PacketType.RIVAL_SERVE),
@@ -232,7 +235,8 @@ public class GameServerTest {
                 builder.create(4, PacketType.ME_BOUND_MY_AREA),
                 builder.create(6, PacketType.ME_RETURN),
                 builder.create(10, PacketType.RIVAL_BOUND_RIVAL_AREA),
-                builder.create(14, PacketType.ME_POINT)
+                builder.create(14, PacketType.ME_POINT),
+                builder.create(18, PacketType.ME_READY)
         )));
     }
 }

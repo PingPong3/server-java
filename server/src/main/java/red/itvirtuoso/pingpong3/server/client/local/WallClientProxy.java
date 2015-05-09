@@ -1,5 +1,6 @@
 package red.itvirtuoso.pingpong3.server.client.local;
 
+import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -15,11 +16,13 @@ import red.itvirtuoso.pingpong3.server.client.ClientProxy;
 public class WallClientProxy extends ClientProxy {
     private long stepTime;
     private boolean isClosed;
+    private Random random;
 
     public WallClientProxy(long stepTime) {
         super();
         this.stepTime = stepTime;
         this.isClosed = false;
+        this.random = new Random();
     }
 
     @Override
@@ -37,6 +40,10 @@ public class WallClientProxy extends ClientProxy {
     }
 
     private void receiveSwing(long step) {
+        if (random.nextInt(4) == 0) {
+            /* 一定の確率て空振りさせる */
+            return;
+        }
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
         service.schedule(new Runnable() {
             @Override

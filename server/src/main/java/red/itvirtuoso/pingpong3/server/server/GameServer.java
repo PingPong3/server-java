@@ -49,74 +49,61 @@ public class GameServer implements Runnable {
         System.out.println("Start game");
         while (!client1.isClosed() && !client2.isClosed()) {
             Thread.yield();
-            doClient1Action(client1.receive());
-            doClient2Action(client2.receive());
-            doReservedActions();
+            doClient1(client1.receive());
+            doClient2(client2.receive());
+            executeActions();
         }
         System.out.println("End game");
     }
 
-    private void doClient1Action(Packet packet) {
+    private void doClient1(Packet packet) {
         if (packet == null) {
             return;
         }
 
         if (packet.getType() == PacketType.SWING) {
             if (mode == Mode.CLIENT1_READY) {
-                client1Serve();
+                clientTurn(Target.CLIENT1, true);
             }
         }
     }
 
-    private void doClient2Action(Packet packet) {
+    private void doClient2(Packet packet) {
         if (packet == null) {
             return;
         }
 
         if (packet.getType() == PacketType.SWING) {
             if (mode == Mode.CLIENT2_RETURN) {
-                client2Return();
+                clientTurn(Target.CLIENT2, false);
             }
         }
     }
 
-    private void client1Serve() {
+    private void clientTurn(Target target1, boolean isServe) {
+        Target target2 = (target1 == Target.CLIENT1 ? Target.CLIENT2 : Target.CLIENT1);
         long currentTime = System.currentTimeMillis();
         synchronized (actions) {
             actions.clear();
             addModeAction(currentTime, 0, Mode.BUSY);
-            addPacketAction(currentTime, Target.CLIENT1, 0, PacketType.ME_SERVE);
-            addPacketAction(currentTime, Target.CLIENT2, 0, PacketType.RIVAL_SERVE);
-            addPacketAction(currentTime, Target.CLIENT1, 2, PacketType.RIVAL_BOUND_MY_AREA);
-            addPacketAction(currentTime, Target.CLIENT2, 2, PacketType.ME_BOUND_RIVAL_AREA);
-            addPacketAction(currentTime, Target.CLIENT1, 4, PacketType.RIVAL_BOUND_RIVAL_AREA);
-            addPacketAction(currentTime, Target.CLIENT2, 4, PacketType.ME_BOUND_MY_AREA);
-            addModeAction(currentTime, 5, Mode.CLIENT2_RETURN);
+            if (isServe) {
+                addPacketAction(currentTime, target1, 0, PacketType.ME_SERVE);
+                addPacketAction(currentTime, target2, 0, PacketType.RIVAL_SERVE);
+                addPacketAction(currentTime, target1, 2, PacketType.RIVAL_BOUND_MY_AREA);
+                addPacketAction(currentTime, target2, 2, PacketType.ME_BOUND_RIVAL_AREA);
+            } else {
+                addPacketAction(currentTime, target1, 0, PacketType.ME_RETURN);
+                addPacketAction(currentTime, target2, 0, PacketType.RIVAL_RETURN);
+            }
+            addPacketAction(currentTime, target1, 4, PacketType.RIVAL_BOUND_RIVAL_AREA);
+            addPacketAction(currentTime, target2, 4, PacketType.ME_BOUND_MY_AREA);
+            addReturnModeAction(currentTime, 5, target1);
             addModeAction(currentTime, 7, Mode.BUSY);
-            addPacketAction(currentTime, Target.CLIENT1, 8, PacketType.ME_POINT);
-            addPacketAction(currentTime, Target.CLIENT2, 8, PacketType.RIVAL_POINT);
-            addModeAction(currentTime, 12, Mode.CLIENT1_READY);
-            addPacketAction(currentTime, Target.CLIENT1, 12, PacketType.ME_READY);
-            addPacketAction(currentTime, Target.CLIENT2, 12, PacketType.RIVAL_READY);
-        }
-    }
-
-    private void client2Return() {
-        long currentTime = System.currentTimeMillis();
-        synchronized (actions) {
-            actions.clear();
-            addModeAction(currentTime, 0, Mode.BUSY);
-            addPacketAction(currentTime, Target.CLIENT2, 0, PacketType.ME_RETURN);
-            addPacketAction(currentTime, Target.CLIENT1, 0, PacketType.RIVAL_RETURN);
-            addPacketAction(currentTime, Target.CLIENT2, 4, PacketType.RIVAL_BOUND_RIVAL_AREA);
-            addPacketAction(currentTime, Target.CLIENT1, 4, PacketType.ME_BOUND_MY_AREA);
-            addModeAction(currentTime, 5, Mode.CLIENT1_RETURN);
-            addModeAction(currentTime, 7, Mode.BUSY);
-            addPacketAction(currentTime, Target.CLIENT2, 8, PacketType.ME_POINT);
-            addPacketAction(currentTime, Target.CLIENT1, 8, PacketType.RIVAL_POINT);
-            addModeAction(currentTime, 12, Mode.CLIENT2_READY);
-            addPacketAction(currentTime, Target.CLIENT2, 12, PacketType.ME_READY);
-            addPacketAction(currentTime, Target.CLIENT1, 12, PacketType.RIVAL_READY);
+            addPacketAction(currentTime, target1, 8, PacketType.ME_POINT);
+            addPacketAction(currentTime, target2, 8, PacketType.RIVAL_POINT);
+            addReadyModeAction(currentTime, 12, target1);
+            addPacketAction(currentTime, target1, 12, PacketType.ME_READY);
+            addPacketAction(currentTime, target2, 12, PacketType.RIVAL_READY);
         }
     }
 
@@ -139,6 +126,26 @@ public class GameServer implements Runnable {
         });
     }
 
+    private void addReturnModeAction(long currentTime, int step, Target target) {
+        if (target == Target.CLIENT1) {
+            addModeAction(currentTime, step, Mode.CLIENT2_RETURN);
+        } else if (target == Target.CLIENT2) {
+            addModeAction(currentTime, step, Mode.CLIENT1_RETURN);
+        } else {
+            /* NOP */
+        }
+    }
+
+    private void addReadyModeAction(long currentTime, int step, Target target) {
+        if (target == Target.CLIENT1) {
+            addModeAction(currentTime, step, Mode.CLIENT1_READY);
+        } else if (target == Target.CLIENT2) {
+            addModeAction(currentTime, step, Mode.CLIENT2_READY);
+        } else {
+            /* NOP */
+        }
+    }
+
     private void addModeAction(long currentTime, int step, Mode mode) {
         long time = currentTime + step * stepTime;
         actions.add(new ModeAction(time, mode) {
@@ -149,7 +156,7 @@ public class GameServer implements Runnable {
         });
     }
 
-    private void doReservedActions() {
+    private void executeActions() {
         synchronized (actions) {
             while (actions.size() > 0) {
                 Action action = actions.get(0);

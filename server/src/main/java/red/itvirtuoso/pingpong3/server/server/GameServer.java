@@ -74,7 +74,10 @@ public class GameServer implements Runnable {
         if (packet.getType() == PacketType.SWING) {
             if (mode == Mode.CLIENT1_READY) {
                 clientTurn(Target.CLIENT1, true);
+            } else if (mode == Mode.CLIENT1_RETURN) {
+                clientTurn(Target.CLIENT1, false);
             }
+
         }
     }
 
@@ -84,7 +87,9 @@ public class GameServer implements Runnable {
         }
 
         if (packet.getType() == PacketType.SWING) {
-            if (mode == Mode.CLIENT2_RETURN) {
+            if (mode == Mode.CLIENT2_READY) {
+                clientTurn(Target.CLIENT2, true);
+            } else  if (mode == Mode.CLIENT2_RETURN) {
                 clientTurn(Target.CLIENT2, false);
             }
         }

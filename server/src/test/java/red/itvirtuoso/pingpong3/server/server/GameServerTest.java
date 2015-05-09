@@ -143,6 +143,17 @@ public class GameServerTest {
         )));
     }
 
+    /*
+     * 以下、次のアクションをテストする。複数のアクションを一つのテストで兼ねていることもある。
+     * <ul>
+     *     <li>一人目のサーブ</li>
+     *     <li>一人目のリターン</li>
+     *     <li>一人目のミス</li>
+     *     <li>二人目のサーブ</li>
+     *     <li>二人目のリターン</li>
+     *     <li>二人目のミス</li>
+     */
+
     @Test
     public void 一人目がサーブして二人目がミスする() throws Exception {
         /* ゲーム開始 */
@@ -182,11 +193,10 @@ public class GameServerTest {
         GameServer gameServer = new GameServer(client1, STEP_TIME);
         TestClientProxy client2 = new TestClientProxy();
         gameServer.challenge(client2, false);
-        client1.clearPackets();
-        client2.clearPackets();
         /* 一人目がサーブ */
         client1.addPacket(new Packet(PacketType.SWING));
         Thread.sleep(STEP_TIME * 6);
+        /* パケットのクリア */
         client1.clearPackets();
         client2.clearPackets();
         /* 二人目がリターン */
@@ -204,6 +214,82 @@ public class GameServerTest {
         )));
         assertThat(client2.sendLogs, is(contains(
                 builder.create(0, PacketType.ME_RETURN),
+                builder.create(4, PacketType.RIVAL_BOUND_RIVAL_AREA),
+                builder.create(8, PacketType.ME_POINT),
+                builder.create(12, PacketType.ME_READY)
+        )));
+    }
+
+    @Test
+    public void 一人目がリターンして二人目がミスする() throws Exception {
+        /* ゲーム開始 */
+        TestClientProxy client1 = new TestClientProxy();
+        GameServer gameServer = new GameServer(client1, STEP_TIME);
+        TestClientProxy client2 = new TestClientProxy();
+        gameServer.challenge(client2, false);
+        /* 一人目がサーブ */
+        client1.addPacket(new Packet(PacketType.SWING));
+        Thread.sleep(STEP_TIME * 6);
+        /* 二人目がリターン */
+        client2.addPacket(new Packet(PacketType.SWING));
+        Thread.sleep(STEP_TIME * 6);
+        /* パケットのクリア */
+        client1.clearPackets();
+        client2.clearPackets();
+        /* 一人目がリターン */
+        client1.addPacket(new Packet(PacketType.SWING));
+        Thread.sleep(STEP_TIME * 12);
+        Thread.sleep(STEP_TIME);
+
+        /* パケットチェック */
+        _LogBuilder builder = new _LogBuilder(STEP_TIME);
+        assertThat(client1.sendLogs, is(contains(
+                builder.create(0, PacketType.ME_RETURN),
+                builder.create(4, PacketType.RIVAL_BOUND_RIVAL_AREA),
+                builder.create(8, PacketType.ME_POINT),
+                builder.create(12, PacketType.ME_READY)
+        )));
+        assertThat(client2.sendLogs, is(contains(
+                builder.create(0, PacketType.RIVAL_RETURN),
+                builder.create(4, PacketType.ME_BOUND_MY_AREA),
+                builder.create(8, PacketType.RIVAL_POINT),
+                builder.create(12, PacketType.RIVAL_READY)
+        )));
+    }
+
+    @Test
+    public void 二人目がサーブして一人目がミスする() throws Exception {
+        /* ゲーム開始 */
+        TestClientProxy client1 = new TestClientProxy();
+        GameServer gameServer = new GameServer(client1, STEP_TIME);
+        TestClientProxy client2 = new TestClientProxy();
+        gameServer.challenge(client2, false);
+        /* 一人目がサーブ */
+        client1.addPacket(new Packet(PacketType.SWING));
+        Thread.sleep(STEP_TIME * 6);
+        /* 二人目がリターン */
+        client2.addPacket(new Packet(PacketType.SWING));
+        Thread.sleep(STEP_TIME * 12);
+        /* パケットのクリア */
+        client1.clearPackets();
+        client2.clearPackets();
+        /* 二人目がサーブ */
+        client2.addPacket(new Packet(PacketType.SWING));
+        Thread.sleep(STEP_TIME * 12);
+        Thread.sleep(STEP_TIME);
+
+        /* パケットチェック */
+        _LogBuilder builder = new _LogBuilder(STEP_TIME);
+        assertThat(client1.sendLogs, is(contains(
+                builder.create(0, PacketType.RIVAL_SERVE),
+                builder.create(2, PacketType.ME_BOUND_RIVAL_AREA),
+                builder.create(4, PacketType.ME_BOUND_MY_AREA),
+                builder.create(8, PacketType.RIVAL_POINT),
+                builder.create(12, PacketType.RIVAL_READY)
+        )));
+        assertThat(client2.sendLogs, is(contains(
+                builder.create(0, PacketType.ME_SERVE),
+                builder.create(2, PacketType.RIVAL_BOUND_MY_AREA),
                 builder.create(4, PacketType.RIVAL_BOUND_RIVAL_AREA),
                 builder.create(8, PacketType.ME_POINT),
                 builder.create(12, PacketType.ME_READY)

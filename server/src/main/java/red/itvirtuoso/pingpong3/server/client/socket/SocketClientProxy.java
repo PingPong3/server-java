@@ -6,10 +6,10 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import red.itvirtuoso.pingpong3.server.client.ClientException;
-import red.itvirtuoso.pingpong3.server.client.ClientProxy;
 import red.itvirtuoso.pingpong3.server.Packet;
 import red.itvirtuoso.pingpong3.server.PacketType;
+import red.itvirtuoso.pingpong3.server.client.ClientException;
+import red.itvirtuoso.pingpong3.server.client.ClientProxy;
 
 /**
  * Created by kenji on 15/05/06.

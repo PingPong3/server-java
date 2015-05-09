@@ -23,7 +23,13 @@ public abstract class ClientProxy {
 
     public final Packet receive() {
         synchronized (packets) {
-            return packets.size() == 0 ? null : packets.remove(0);
+            Packet packet;
+            if (packets.size() > 0) {
+                packet = packets.remove(0);
+            } else {
+                packet = null;
+            }
+            return packet;
         }
     }
 }

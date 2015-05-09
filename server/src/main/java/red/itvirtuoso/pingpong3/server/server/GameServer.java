@@ -15,7 +15,7 @@ import red.itvirtuoso.pingpong3.server.server.action.PacketAction;
  * Created by kenji on 15/05/04.
  */
 public class GameServer implements Runnable {
-    private static final long STEP_TIME = 350;
+    public static final long STEP_TIME = 350;
 
     private long stepTime;
     private ClientProxy client1;

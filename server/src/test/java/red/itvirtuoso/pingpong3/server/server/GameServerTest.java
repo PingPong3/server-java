@@ -103,29 +103,20 @@ public class GameServerTest {
 
         private void clearPackets() {
             sendLogs.clear();
+            builder = new _LogBuilder(STEP_TIME);
         }
     }
 
     @Test
     public void ゲームを開始する() throws Exception {
-        /*
-         * 次のパケットが順に送信される
-         * <p>client1</p>
-         * <ul>
-         *     <li>0, ME_READY</li>
-         * </ul>
-         * <p>client2</p>
-         * <ul>
-         *     <li>0, RIVAL_READY</li>
-         * </ul>
-         */
-
+        /* ゲーム開始 */
         TestClientProxy client1 = new TestClientProxy();
-        _LogBuilder builder = new _LogBuilder(STEP_TIME);
         GameServer gameServer = new GameServer(client1, STEP_TIME);
         TestClientProxy client2 = new TestClientProxy();
         gameServer.challenge(client2, false);
 
+        /* パケットチェック */
+        _LogBuilder builder = new _LogBuilder(STEP_TIME);
         assertThat(client1.sendLogs, is(contains(
                 builder.create(0, PacketType.ME_READY)
         )));
@@ -136,24 +127,14 @@ public class GameServerTest {
 
     @Test
     public void 後から参加したクライアントにサーブ権がある状態でゲームを開始する() throws Exception {
-        /*
-         * 次のパケットが順に送信される
-         * <p>client1</p>
-         * <ul>
-         *     <li>0, RIVAL_READY</li>
-         * </ul>
-         * <p>client2</p>
-         * <ul>
-         *     <li>0, ME_READY</li>
-         * </ul>
-         */
-
+        /* ゲーム開始 */
         TestClientProxy client1 = new TestClientProxy();
-        _LogBuilder builder = new _LogBuilder(STEP_TIME);
         GameServer gameServer = new GameServer(client1, STEP_TIME);
         TestClientProxy client2 = new TestClientProxy();
         gameServer.challenge(client2, true);
 
+        /* パケットチェック */
+        _LogBuilder builder = new _LogBuilder(STEP_TIME);
         assertThat(client1.sendLogs, is(contains(
                 builder.create(0, PacketType.RIVAL_READY)
         )));
@@ -164,35 +145,19 @@ public class GameServerTest {
 
     @Test
     public void 一人目がサーブして二人目がミスする() throws Exception {
-        /*
-         * 次のパケットが順に送信される
-         * <p>client1</p>
-         * <ul>
-         *     <li>0, ME_SERVE</li>
-         *     <li>2, RIVAL_BOUND_MY_AREA</li>
-         *     <li>4, RIVAL_BOUND_RIVAL_AREA</li>
-         *     <li>8, ME_POINT</li>
-         * </ul>
-         * <p>client2</p>
-         * <ul>
-         *     <li>0, RIVAL_SERVE</li>
-         *     <li>2, ME_BOUND_RIVAL_AREA</li>
-         *     <li>4, ME_BOUND_ME_AREA</li>
-         *     <li>8, RIVAL_POINT</li>
-         * </ul>
-         */
-
+        /* ゲーム開始 */
         TestClientProxy client1 = new TestClientProxy();
         GameServer gameServer = new GameServer(client1, STEP_TIME);
         TestClientProxy client2 = new TestClientProxy();
         gameServer.challenge(client2, false);
         client1.clearPackets();
         client2.clearPackets();
-
+        /* 一人目がサーブ */
         client1.addPacket(new Packet(PacketType.SWING));
         Thread.sleep(STEP_TIME * 12);
         Thread.sleep(STEP_TIME);
 
+        /* パケットチェック */
         _LogBuilder builder = new _LogBuilder(STEP_TIME);
         assertThat(client1.sendLogs, is(contains(
                 builder.create(0, PacketType.ME_SERVE),
@@ -211,60 +176,37 @@ public class GameServerTest {
     }
 
     @Test
-    public void 一人目がサーブして二人目がリターンする() throws Exception {
-        /*
-         * 次のパケットが順に送信される
-         * <p>client1</p>
-         * <ul>
-         *     <li>0, ME_SERVE</li>
-         *     <li>2, RIVAL_BOUND_MY_AREA</li>
-         *     <li>4, RIVAL_BOUND_RIVAL_AREA</li>
-         *     <li>6, RIVAL_RETURN</li>
-         *     <li>10, ME_BOUND_MY_AREA</li>
-         *     <li>14, RIVAL_POINT</li>
-         * </ul>
-         * <p>client2</p>
-         * <ul>
-         *     <li>0, RIVAL_SERVE</li>
-         *     <li>2, ME_BOUND_RIVAL_AREA</li>
-         *     <li>4, ME_BOUND_ME_AREA</li>
-         *     <li>6, ME_RETURN</li>
-         *     <li>10, RIVAL_BOUND_RIVAL_AREA</li>
-         *     <li>14, ME_POINT</li>
-         * </ul>
-         */
-
+    public void 二人目がリターンして一人目がミスする() throws Exception {
+        /* ゲーム開始 */
         TestClientProxy client1 = new TestClientProxy();
         GameServer gameServer = new GameServer(client1, STEP_TIME);
         TestClientProxy client2 = new TestClientProxy();
         gameServer.challenge(client2, false);
         client1.clearPackets();
         client2.clearPackets();
-
+        /* 一人目がサーブ */
         client1.addPacket(new Packet(PacketType.SWING));
         Thread.sleep(STEP_TIME * 6);
+        client1.clearPackets();
+        client2.clearPackets();
+        /* 二人目がリターン */
         client2.addPacket(new Packet(PacketType.SWING));
         Thread.sleep(STEP_TIME * 12);
         Thread.sleep(STEP_TIME);
 
+        /* パケットチェック */
         _LogBuilder builder = new _LogBuilder(STEP_TIME);
         assertThat(client1.sendLogs, is(contains(
-                builder.create(0, PacketType.ME_SERVE),
-                builder.create(2, PacketType.RIVAL_BOUND_MY_AREA),
-                builder.create(4, PacketType.RIVAL_BOUND_RIVAL_AREA),
-                builder.create(6, PacketType.RIVAL_RETURN),
-                builder.create(10, PacketType.ME_BOUND_MY_AREA),
-                builder.create(14, PacketType.RIVAL_POINT),
-                builder.create(18, PacketType.RIVAL_READY)
+                builder.create(0, PacketType.RIVAL_RETURN),
+                builder.create(4, PacketType.ME_BOUND_MY_AREA),
+                builder.create(8, PacketType.RIVAL_POINT),
+                builder.create(12, PacketType.RIVAL_READY)
         )));
         assertThat(client2.sendLogs, is(contains(
-                builder.create(0, PacketType.RIVAL_SERVE),
-                builder.create(2, PacketType.ME_BOUND_RIVAL_AREA),
-                builder.create(4, PacketType.ME_BOUND_MY_AREA),
-                builder.create(6, PacketType.ME_RETURN),
-                builder.create(10, PacketType.RIVAL_BOUND_RIVAL_AREA),
-                builder.create(14, PacketType.ME_POINT),
-                builder.create(18, PacketType.ME_READY)
+                builder.create(0, PacketType.ME_RETURN),
+                builder.create(4, PacketType.RIVAL_BOUND_RIVAL_AREA),
+                builder.create(8, PacketType.ME_POINT),
+                builder.create(12, PacketType.ME_READY)
         )));
     }
 }

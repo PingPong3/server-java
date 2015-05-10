@@ -41,6 +41,7 @@ public class SocketClientProxy extends ClientProxy implements Runnable {
                     break;
                 }
                 Packet packet = new Packet(PacketType.valueOf(data));
+                System.out.println("RCV " + packet);
                 addPacket(packet);
             }
         } catch (IOException e) {
@@ -55,6 +56,7 @@ public class SocketClientProxy extends ClientProxy implements Runnable {
     @Override
     public void send(Packet packet) throws ClientException {
         try {
+            System.out.println("SND " + packet);
             socket.getOutputStream().write(packet.getType().getId());
         } catch (IOException e) {
             throw new ClientException(e);

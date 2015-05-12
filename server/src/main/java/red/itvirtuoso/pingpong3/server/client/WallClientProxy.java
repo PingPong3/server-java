@@ -1,4 +1,4 @@
-package red.itvirtuoso.pingpong3.server.client.local;
+package red.itvirtuoso.pingpong3.server.client;
 
 import java.util.Random;
 import java.util.concurrent.Executors;

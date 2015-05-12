@@ -11,8 +11,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import red.itvirtuoso.pingpong3.server.client.ClientProxy;
-import red.itvirtuoso.pingpong3.server.client.local.WallClientProxy;
-import red.itvirtuoso.pingpong3.server.client.socket.SocketClientProxy;
+import red.itvirtuoso.pingpong3.server.client.WallClientProxy;
+import red.itvirtuoso.pingpong3.server.client.SocketClientProxy;
 import red.itvirtuoso.pingpong3.server.server.GameServer;
 
 public class Main {

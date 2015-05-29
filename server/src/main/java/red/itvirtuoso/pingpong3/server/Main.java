@@ -16,6 +16,8 @@ import red.itvirtuoso.pingpong3.server.client.SocketClientProxy;
 import red.itvirtuoso.pingpong3.server.server.GameServer;
 
 public class Main {
+    private static final int TIMEOUT = 3;
+
     public static void main(String[] args) {
         try (final ServerSocket listener = new ServerSocket()) {
             listener.setReuseAddress(true);
@@ -33,7 +35,7 @@ public class Main {
                 });
                 ClientProxy clientProxy2 = null;
                 try {
-                    clientProxy2 = future.get(10, TimeUnit.SECONDS);
+                    clientProxy2 = future.get(TIMEOUT, TimeUnit.SECONDS);
                 } catch (TimeoutException e) {
                     clientProxy2 = new WallClientProxy(GameServer.STEP_TIME);
                 } catch (Exception e) {

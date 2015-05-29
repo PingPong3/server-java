@@ -34,6 +34,9 @@ public class GameServer implements Runnable {
     }
 
     public void challenge(ClientProxy client2, boolean hasServe) {
+        this.client1.send(new Packet(PacketType.BEGIN));
+        client2.send(new Packet(PacketType.BEGIN));
+
         if (hasServe) {
             ClientProxy client1 = this.client1;
             this.client1 = client2;

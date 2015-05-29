@@ -118,9 +118,11 @@ public class GameServerTest {
         /* パケットチェック */
         _LogBuilder builder = new _LogBuilder(STEP_TIME);
         assertThat(client1.sendLogs, is(contains(
+                builder.create(0, PacketType.BEGIN),
                 builder.create(0, PacketType.ME_READY)
         )));
         assertThat(client2.sendLogs, is(contains(
+                builder.create(0, PacketType.BEGIN),
                 builder.create(0, PacketType.RIVAL_READY)
         )));
     }
@@ -136,9 +138,11 @@ public class GameServerTest {
         /* パケットチェック */
         _LogBuilder builder = new _LogBuilder(STEP_TIME);
         assertThat(client1.sendLogs, is(contains(
+                builder.create(0, PacketType.BEGIN),
                 builder.create(0, PacketType.RIVAL_READY)
         )));
         assertThat(client2.sendLogs, is(contains(
+                builder.create(0, PacketType.BEGIN),
                 builder.create(0, PacketType.ME_READY)
         )));
     }

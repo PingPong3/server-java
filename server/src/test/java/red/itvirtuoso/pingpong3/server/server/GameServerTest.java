@@ -29,8 +29,8 @@ public class GameServerTest {
             this.stepTime = stepTime;
         }
 
-        private _Log create(PacketType type) {
-            return new _Log((System.currentTimeMillis() - this.beginTime) / this.stepTime, type);
+        private _Log create(Packet packet) {
+            return new _Log((System.currentTimeMillis() - this.beginTime) / this.stepTime, packet.getType(), packet.getData());
         }
 
         private _Log create(long step, PacketType type, int... data) {
@@ -94,7 +94,7 @@ public class GameServerTest {
 
         @Override
         public void send(Packet packet) {
-            sendLogs.add(builder.create(packet.getType()));
+            sendLogs.add(builder.create(packet));
         }
 
         @Override
@@ -294,14 +294,14 @@ public class GameServerTest {
                 builder.create(0, PacketType.RIVAL_SERVE),
                 builder.create(2, PacketType.ME_BOUND_RIVAL_AREA),
                 builder.create(4, PacketType.ME_BOUND_MY_AREA),
-                builder.create(8, PacketType.RIVAL_POINT, 0, 1),
+                builder.create(8, PacketType.RIVAL_POINT, 0, 2),
                 builder.create(12, PacketType.RIVAL_READY)
         )));
         assertThat(client2.sendLogs, is(contains(
                 builder.create(0, PacketType.ME_SERVE),
                 builder.create(2, PacketType.RIVAL_BOUND_MY_AREA),
                 builder.create(4, PacketType.RIVAL_BOUND_RIVAL_AREA),
-                builder.create(8, PacketType.ME_POINT, 1, 0),
+                builder.create(8, PacketType.ME_POINT, 2, 0),
                 builder.create(12, PacketType.ME_READY)
         )));
     }

@@ -11,6 +11,14 @@ public abstract class ClientProxy {
     private ArrayList<Packet> packets = new ArrayList<>();
     private int score = 0;
 
+    public int getScore() {
+        return score;
+    }
+
+    public void incrementScore() {
+        score++;
+    }
+
     public abstract boolean isClosed();
     public abstract void send(Packet packet) throws ClientException;
 

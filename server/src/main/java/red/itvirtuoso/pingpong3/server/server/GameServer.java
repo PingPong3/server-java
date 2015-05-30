@@ -10,6 +10,7 @@ import red.itvirtuoso.pingpong3.server.client.ClientProxy;
 import red.itvirtuoso.pingpong3.server.server.action.Action;
 import red.itvirtuoso.pingpong3.server.server.action.ModeAction;
 import red.itvirtuoso.pingpong3.server.server.action.PacketAction;
+import red.itvirtuoso.pingpong3.server.server.action.ScoreAction;
 
 /**
  * Created by kenji on 15/05/04.
@@ -116,6 +117,7 @@ public class GameServer implements Runnable {
             addPacketAction(currentTime, target2, 4, PacketType.ME_BOUND_MY_AREA);
             addReturnModeAction(currentTime, 5, target1);
             addModeAction(currentTime, 7, Mode.BUSY);
+            addScoreAction(currentTime, 8, target1);
             addPacketAction(currentTime, target1, 8, PacketType.ME_POINT);
             addPacketAction(currentTime, target2, 8, PacketType.RIVAL_POINT);
             addReadyModeAction(currentTime, 12, target1);
@@ -124,21 +126,21 @@ public class GameServer implements Runnable {
         }
     }
 
-    private void addPacketAction(long currentTime, Target target, int step, PacketType type) {
+    private void addPacketAction(long currentTime, Target target, int step, final PacketType type) {
         long time = currentTime + step * stepTime;
         actions.add(new PacketAction(time, target, type) {
             @Override
             public void execute() {
-                Packet packet = new Packet(getType());
-                switch (getTarget()) {
-                    case CLIENT1:
-                        client1.send(packet);
-                        break;
-                    case CLIENT2:
-                        client2.send(packet);
-                        break;
-                    default: /* nop */
+                ClientProxy client1 = (getTarget() == Target.CLIENT1 ? GameServer.this.client1 : GameServer.this.client2);
+                ClientProxy client2 = (getTarget() == Target.CLIENT1 ? GameServer.this.client2 : GameServer.this.client1);
+
+                Packet packet;
+                if (type == PacketType.ME_POINT || type == PacketType.RIVAL_POINT) {
+                    packet = new Packet(getType(), client1.getScore(), client2.getScore());
+                } else {
+                    packet = new Packet(getType());
                 }
+                client1.send(packet);
             }
         });
     }
@@ -169,6 +171,22 @@ public class GameServer implements Runnable {
             @Override
             public void execute() {
                 GameServer.this.mode = getMode();
+            }
+        });
+    }
+
+    private void addScoreAction(long currentTime, int step, Target target) {
+        long time = currentTime + step * stepTime;
+        actions.add(new ScoreAction(time, target) {
+            @Override
+            public void execute() {
+                if (getTarget() == Target.CLIENT1) {
+                    client1.incrementScore();
+                } else if (getTarget() == Target.CLIENT2) {
+                    client2.incrementScore();
+                } else {
+                    /* NOP */
+                }
             }
         });
     }

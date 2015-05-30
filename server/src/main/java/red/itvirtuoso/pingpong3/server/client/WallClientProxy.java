@@ -7,8 +7,6 @@ import java.util.concurrent.TimeUnit;
 
 import red.itvirtuoso.pingpong3.server.Packet;
 import red.itvirtuoso.pingpong3.server.PacketType;
-import red.itvirtuoso.pingpong3.server.client.ClientException;
-import red.itvirtuoso.pingpong3.server.client.ClientProxy;
 
 /**
  * Created by kenji on 15/05/06.
@@ -35,15 +33,15 @@ public class WallClientProxy extends ClientProxy {
         if (packet.getType() == PacketType.ME_READY) {
             receiveSwing(6);
         } else if (packet.getType() == PacketType.ME_BOUND_MY_AREA) {
+            if (random.nextInt(4) == 0) {
+            /* 一定の確率て空振りさせる */
+                return;
+            }
             receiveSwing(2);
         }
     }
 
     private void receiveSwing(long step) {
-        if (random.nextInt(4) == 0) {
-            /* 一定の確率て空振りさせる */
-            return;
-        }
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
         service.schedule(new Runnable() {
             @Override

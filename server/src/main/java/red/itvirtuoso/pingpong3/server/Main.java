@@ -3,20 +3,15 @@ package red.itvirtuoso.pingpong3.server;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.net.SocketTimeoutException;
 
 import red.itvirtuoso.pingpong3.server.client.ClientProxy;
-import red.itvirtuoso.pingpong3.server.client.WallClientProxy;
 import red.itvirtuoso.pingpong3.server.client.SocketClientProxy;
+import red.itvirtuoso.pingpong3.server.client.WallClientProxy;
 import red.itvirtuoso.pingpong3.server.server.GameServer;
 
 public class Main {
-    private static final int TIMEOUT = 3;
+    private static final int TIMEOUT = 3 * 1000;
 
     public static void main(String[] args) {
         try (final ServerSocket listener = new ServerSocket()) {
@@ -24,20 +19,18 @@ public class Main {
             listener.bind(new InetSocketAddress(5000));
             System.out.println("Server listening port 5000...");
             while (true) {
+                System.out.println("start new loop");
                 ClientProxy clientProxy1 = new SocketClientProxy(listener.accept());
+                System.out.println("Client1 is connected.");
                 GameServer gameServer = new GameServer(clientProxy1);
-                ExecutorService service = Executors.newSingleThreadExecutor();
-                Future<ClientProxy> future = service.submit(new Callable<ClientProxy>() {
-                    @Override
-                    public ClientProxy call() throws Exception {
-                        return new SocketClientProxy(listener.accept());
-                    }
-                });
                 ClientProxy clientProxy2 = null;
                 try {
-                    clientProxy2 = future.get(TIMEOUT, TimeUnit.SECONDS);
-                } catch (TimeoutException e) {
+                    listener.setSoTimeout(TIMEOUT);
+                    clientProxy2 = new SocketClientProxy(listener.accept());
+                    System.out.println("Client2 is connected.");
+                } catch (SocketTimeoutException e) {
                     clientProxy2 = new WallClientProxy(GameServer.STEP_TIME);
+                    System.out.println("Client2 is cpu player.");
                 } catch (Exception e) {
                     if (clientProxy1 != null) {
                         clientProxy1.close();
@@ -46,6 +39,8 @@ public class Main {
                         clientProxy2.close();
                     }
                     continue;
+                } finally {
+                    listener.setSoTimeout(0);
                 }
                 gameServer.challenge(clientProxy2, false);
             }

@@ -9,6 +9,7 @@ import red.itvirtuoso.pingpong3.server.Packet;
  */
 public abstract class ClientProxy {
     private ArrayList<Packet> packets = new ArrayList<>();
+    private int score = 0;
 
     public abstract boolean isClosed();
     public abstract void send(Packet packet) throws ClientException;

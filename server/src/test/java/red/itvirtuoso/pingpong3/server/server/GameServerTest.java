@@ -3,6 +3,7 @@ package red.itvirtuoso.pingpong3.server.server;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import red.itvirtuoso.pingpong3.server.client.ClientProxy;
 import red.itvirtuoso.pingpong3.server.Packet;
@@ -32,8 +33,8 @@ public class GameServerTest {
             return new _Log((System.currentTimeMillis() - this.beginTime) / this.stepTime, type);
         }
 
-        private _Log create(long step, PacketType type) {
-            return new _Log(step, type);
+        private _Log create(long step, PacketType type, int... data) {
+            return new _Log(step, type, data);
         }
     }
 
@@ -41,10 +42,12 @@ public class GameServerTest {
     private class _Log {
         private long step;
         private PacketType type;
+        private int[] data;
 
-        private _Log(long step, PacketType type) {
+        private _Log(long step, PacketType type, int... data) {
             this.step = step;
             this.type = type;
+            this.data = (data != null ? data : new int[0]);
         }
 
         @Override
@@ -55,6 +58,7 @@ public class GameServerTest {
             _Log log = (_Log) o;
 
             if (step != log.step) return false;
+            if (!Arrays.equals(data, log.data)) return false;
             if (type != log.type) return false;
 
             return true;
@@ -64,14 +68,16 @@ public class GameServerTest {
         public int hashCode() {
             int result = (int) (step ^ (step >>> 32));
             result = 31 * result + type.hashCode();
+            result = 31 * result + Arrays.hashCode(data);
             return result;
         }
 
         @Override
         public String toString() {
-            return getClass().getSimpleName() + "{" +
+            return "_Log{" +
                     "step=" + step +
                     ", type=" + type +
+                    ", data=" + Arrays.toString(data) +
                     '}';
         }
     }
@@ -178,14 +184,14 @@ public class GameServerTest {
                 builder.create(0, PacketType.ME_SERVE),
                 builder.create(2, PacketType.RIVAL_BOUND_MY_AREA),
                 builder.create(4, PacketType.RIVAL_BOUND_RIVAL_AREA),
-                builder.create(8, PacketType.ME_POINT),
+                builder.create(8, PacketType.ME_POINT, 1, 0),
                 builder.create(12, PacketType.ME_READY)
         )));
         assertThat(client2.sendLogs, is(contains(
                 builder.create(0, PacketType.RIVAL_SERVE),
                 builder.create(2, PacketType.ME_BOUND_RIVAL_AREA),
                 builder.create(4, PacketType.ME_BOUND_MY_AREA),
-                builder.create(8, PacketType.RIVAL_POINT),
+                builder.create(8, PacketType.RIVAL_POINT, 0, 1),
                 builder.create(12, PacketType.RIVAL_READY)
         )));
     }
@@ -213,13 +219,13 @@ public class GameServerTest {
         assertThat(client1.sendLogs, is(contains(
                 builder.create(0, PacketType.RIVAL_RETURN),
                 builder.create(4, PacketType.ME_BOUND_MY_AREA),
-                builder.create(8, PacketType.RIVAL_POINT),
+                builder.create(8, PacketType.RIVAL_POINT, 0, 1),
                 builder.create(12, PacketType.RIVAL_READY)
         )));
         assertThat(client2.sendLogs, is(contains(
                 builder.create(0, PacketType.ME_RETURN),
                 builder.create(4, PacketType.RIVAL_BOUND_RIVAL_AREA),
-                builder.create(8, PacketType.ME_POINT),
+                builder.create(8, PacketType.ME_POINT, 1, 0),
                 builder.create(12, PacketType.ME_READY)
         )));
     }
@@ -250,13 +256,13 @@ public class GameServerTest {
         assertThat(client1.sendLogs, is(contains(
                 builder.create(0, PacketType.ME_RETURN),
                 builder.create(4, PacketType.RIVAL_BOUND_RIVAL_AREA),
-                builder.create(8, PacketType.ME_POINT),
+                builder.create(8, PacketType.ME_POINT, 1, 0),
                 builder.create(12, PacketType.ME_READY)
         )));
         assertThat(client2.sendLogs, is(contains(
                 builder.create(0, PacketType.RIVAL_RETURN),
                 builder.create(4, PacketType.ME_BOUND_MY_AREA),
-                builder.create(8, PacketType.RIVAL_POINT),
+                builder.create(8, PacketType.RIVAL_POINT, 0, 1),
                 builder.create(12, PacketType.RIVAL_READY)
         )));
     }
@@ -288,14 +294,14 @@ public class GameServerTest {
                 builder.create(0, PacketType.RIVAL_SERVE),
                 builder.create(2, PacketType.ME_BOUND_RIVAL_AREA),
                 builder.create(4, PacketType.ME_BOUND_MY_AREA),
-                builder.create(8, PacketType.RIVAL_POINT),
+                builder.create(8, PacketType.RIVAL_POINT, 0, 1),
                 builder.create(12, PacketType.RIVAL_READY)
         )));
         assertThat(client2.sendLogs, is(contains(
                 builder.create(0, PacketType.ME_SERVE),
                 builder.create(2, PacketType.RIVAL_BOUND_MY_AREA),
                 builder.create(4, PacketType.RIVAL_BOUND_RIVAL_AREA),
-                builder.create(8, PacketType.ME_POINT),
+                builder.create(8, PacketType.ME_POINT, 1, 0),
                 builder.create(12, PacketType.ME_READY)
         )));
     }

@@ -1,17 +1,25 @@
 package red.itvirtuoso.pingpong3.server;
 
+import java.util.Arrays;
+
 /**
  * Created by kenji on 15/05/04.
  */
 public class Packet {
     private final PacketType type;
+    private int[] data;
 
-    public Packet(PacketType type) {
+    public Packet(PacketType type, int... data) {
         this.type = type;
+        this.data = (data != null ? data : new int[0]);
     }
 
     public PacketType getType() {
         return type;
+    }
+
+    public int[] getData() {
+        return data;
     }
 
     @Override
@@ -21,6 +29,7 @@ public class Packet {
 
         Packet packet = (Packet) o;
 
+        if (!Arrays.equals(data, packet.data)) return false;
         if (type != packet.type) return false;
 
         return true;
@@ -28,13 +37,16 @@ public class Packet {
 
     @Override
     public int hashCode() {
-        return type.hashCode();
+        int result = type.hashCode();
+        result = 31 * result + Arrays.hashCode(data);
+        return result;
     }
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "{" +
+        return "Packet{" +
                 "type=" + type +
+                ", data=" + Arrays.toString(data) +
                 '}';
     }
 }

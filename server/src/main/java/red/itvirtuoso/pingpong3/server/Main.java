@@ -11,7 +11,7 @@ import red.itvirtuoso.pingpong3.server.client.WallClientProxy;
 import red.itvirtuoso.pingpong3.server.server.GameServer;
 
 public class Main {
-    private static final int TIMEOUT = 3 * 1000;
+    private static final int TIMEOUT = 10 * 1000;
 
     public static void main(String[] args) {
         try (final ServerSocket listener = new ServerSocket()) {

@@ -17,23 +17,30 @@ import red.itvirtuoso.pingpong3.server.server.action.ScoreAction;
  */
 public class GameServer implements Runnable {
     public static final long STEP_TIME = 350;
+    private static final long MIN_STEP_TIME = 100;
 
     private long originalStepTime;
     private long stepTime;
+    private long delta;
     private ClientProxy client1;
     private ClientProxy client2;
     private Mode mode;
     private ArrayList<Action> actions = new ArrayList<>();
 
     public GameServer(ClientProxy client1, long stepTime) {
-        this.client1 = client1;
-        this.originalStepTime = stepTime;
-        this.stepTime = stepTime;
-        mode = Mode.INITIALIZE;
+        this(client1, stepTime, 0);
     }
 
     public GameServer(ClientProxy client1) {
-        this(client1, STEP_TIME);
+        this(client1, STEP_TIME, 10);
+    }
+
+    public GameServer(ClientProxy client1, long stepTime, long delta) {
+        this.client1 = client1;
+        this.originalStepTime = stepTime;
+        this.stepTime = stepTime;
+        this.delta = delta;
+        mode = Mode.INITIALIZE;
     }
 
     public void challenge(ClientProxy client2, boolean hasServe) {
@@ -105,7 +112,9 @@ public class GameServer implements Runnable {
         long currentTime = System.currentTimeMillis();
         synchronized (actions) {
             actions.clear();
-            stepTime -= (stepTime - 100 > 10 ? 10 : stepTime - 100);
+            if (stepTime > MIN_STEP_TIME) {
+                stepTime -= ((stepTime - MIN_STEP_TIME) > delta ? delta : (stepTime - MIN_STEP_TIME));
+            }
             addModeAction(currentTime, 0, Mode.BUSY);
             if (isServe) {
                 addPacketAction(currentTime, target1, 0, PacketType.ME_SERVE);

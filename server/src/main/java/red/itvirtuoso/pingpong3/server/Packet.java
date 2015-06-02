@@ -7,7 +7,7 @@ import java.util.Arrays;
  */
 public class Packet {
     private final PacketType type;
-    private int[] data;
+    private final int[] data;
 
     public Packet(PacketType type, int... data) {
         this.type = type;

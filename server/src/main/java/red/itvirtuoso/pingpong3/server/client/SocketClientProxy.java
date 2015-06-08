@@ -61,6 +61,7 @@ public class SocketClientProxy extends ClientProxy implements Runnable {
                 socket.getOutputStream().write(value);
             }
         } catch (IOException e) {
+            close();
             throw new ClientException(e);
         }
     }

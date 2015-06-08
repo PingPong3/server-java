@@ -19,30 +19,34 @@ public class Main {
             listener.bind(new InetSocketAddress(5000));
             System.out.println("Server listening port 5000...");
             while (true) {
-                System.out.println("start new loop");
-                ClientProxy clientProxy1 = new SocketClientProxy(listener.accept());
-                System.out.println("Client1 is connected.");
-                GameServer gameServer = new GameServer(clientProxy1);
-                ClientProxy clientProxy2 = null;
                 try {
-                    listener.setSoTimeout(TIMEOUT);
-                    clientProxy2 = new SocketClientProxy(listener.accept());
-                    System.out.println("Client2 is connected.");
-                } catch (SocketTimeoutException e) {
-                    clientProxy2 = new WallClientProxy(GameServer.STEP_TIME);
-                    System.out.println("Client2 is cpu player.");
+                    System.out.println("start new loop");
+                    ClientProxy clientProxy1 = new SocketClientProxy(listener.accept());
+                    System.out.println("Client1 is connected.");
+                    GameServer gameServer = new GameServer(clientProxy1);
+                    ClientProxy clientProxy2 = null;
+                    try {
+                        listener.setSoTimeout(TIMEOUT);
+                        clientProxy2 = new SocketClientProxy(listener.accept());
+                        System.out.println("Client2 is connected.");
+                    } catch (SocketTimeoutException e) {
+                        clientProxy2 = new WallClientProxy(GameServer.STEP_TIME);
+                        System.out.println("Client2 is cpu player.");
+                    } catch (Exception e) {
+                        if (clientProxy1 != null) {
+                            clientProxy1.close();
+                        }
+                        if (clientProxy2 != null) {
+                            clientProxy2.close();
+                        }
+                        continue;
+                    } finally {
+                        listener.setSoTimeout(0);
+                    }
+                    gameServer.challenge(clientProxy2, false);
                 } catch (Exception e) {
-                    if (clientProxy1 != null) {
-                        clientProxy1.close();
-                    }
-                    if (clientProxy2 != null) {
-                        clientProxy2.close();
-                    }
-                    continue;
-                } finally {
-                    listener.setSoTimeout(0);
+                    e.printStackTrace();
                 }
-                gameServer.challenge(clientProxy2, false);
             }
         } catch (IOException e) {
             e.printStackTrace();

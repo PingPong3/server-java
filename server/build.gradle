@@ -1,5 +1,7 @@
 apply plugin: 'application'
 
+mainClassName = "red.itvirtuoso.pingpong3.server.Main"
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.11'
